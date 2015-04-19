@@ -6,7 +6,10 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "ejs": "~0.8.5",
+    "ejs-locals": "^1.0.2",
     "express": "~3.3.8",
-    "ejs": "~0.8.5"
+    "morgan": "^1.5.2",
+    "serve-favicon": "^2.2.0"
   }
 }
