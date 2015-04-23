@@ -2,7 +2,7 @@ var express = require('express');
 var http = require('http');
 var path = require('path');
 var config = require('config');
-var log = require('libs/log')(module);
+var log = require('lib/log')(module);
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 

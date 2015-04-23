@@ -6,11 +6,14 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "async": "^0.9.0",
     "ejs": "~0.8.5",
     "ejs-locals": "^1.0.2",
     "express": "~3.3.8",
     "mongodb": "^2.0.27",
+    "mongoose": "^4.0.1",
     "morgan": "^1.5.2",
+    "nconf": "^0.7.1",
     "serve-favicon": "^2.2.0"
   }
 }
