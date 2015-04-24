@@ -5,6 +5,7 @@ var config = require('config');
 var log = require('lib/log')(module);
 var favicon = require('serve-favicon');
 var logger = require('morgan');
+var HttpError = require('error').HttpError;
 
 var app = express();
 app.engine('ejs', require('ejs-locals'));
@@ -22,21 +23,29 @@ if(app.get('env') == 'development'){
 app.use(express.bodyParser()); // req.body
 app.use(express.cookieParser()); // req.cookies
 
+app.use(require('middleware/sendHttpError'));
+
 app.use(app.router);
 
-app.get('/',function(req, res, end){
-  res.render("index");
-});
+require('routes')(app);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function(err, req, res, next){
-  // NODE_ENV = 'production'
-  if (app.get('env') == 'development'){
-    var errorHandler = express.errorHandler();
-    errorHandler(err,req,res,next);
-  }else{
-    res.send(500);
+  if (typeof err == 'number'){
+    err = new HttpError(err);
+  }
+
+  if (err instanceof HttpError){
+    res.sendHttpError(err);
+  } else {
+    if (app.get('env') == 'development'){
+      var errorHandler = express.errorHandler()(err,req,res,next);
+    }else{
+      log.error(err);
+      err = new HttpError(500);
+      res.sendHttpError(err);
+    }
   }
 });
 
