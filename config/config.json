@@ -7,5 +7,14 @@
         "keepAlive" : 1
       }
     }
+  },
+  "session": {
+    "secret": "MySecret",
+    "key": "sid",
+    "cookie": {
+      "path": "/",
+      "httpOnly": true,
+      "maxAge": null
+    }
   }
 }

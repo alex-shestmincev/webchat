@@ -6,6 +6,7 @@ var log = require('lib/log')(module);
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var HttpError = require('error').HttpError;
+var mongoose = require('lib/mongoose');
 
 var app = express();
 app.engine('ejs', require('ejs-locals'));
@@ -22,6 +23,19 @@ if(app.get('env') == 'development'){
 
 app.use(express.bodyParser()); // req.body
 app.use(express.cookieParser()); // req.cookies
+
+var MongoStore = require('connect-mongo')(express);
+app.use(express.session({
+  secret: config.get('session:secret'),
+  key: config.get('session:key'),
+  cookie: config.get('session:cookie'),
+  store: new MongoStore({mongooseConnection: mongoose.connection})
+}));
+
+app.use(function(req, res, next){
+  req.session.numberOfVisits = req.session.numberOfVisits + 1 || 1;
+  res.send("Visits: " + req.session.numberOfVisits);
+});
 
 app.use(require('middleware/sendHttpError'));
 
