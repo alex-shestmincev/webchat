@@ -32,12 +32,8 @@ app.use(express.session({
   store: new MongoStore({mongooseConnection: mongoose.connection})
 }));
 
-app.use(function(req, res, next){
-  req.session.numberOfVisits = req.session.numberOfVisits + 1 || 1;
-  res.send("Visits: " + req.session.numberOfVisits);
-});
-
 app.use(require('middleware/sendHttpError'));
+app.use(require('middleware/loadUser'));
 
 app.use(app.router);
 
@@ -63,6 +59,16 @@ app.use(function(err, req, res, next){
   }
 });
 
-http.createServer(app).listen(config.get('port'),function(){
+var server = http.createServer(app);
+server.listen(config.get('port'),function(){
   log.info('Express server listening on port ' + config.get('port'));
+});
+
+var io = require('socket.io')(server);
+
+io.on('connection', function (socket) {
+  socket.on('message', function(text, cb){ // cb - callback, который вернется клиенту
+    socket.broadcast.emit('message', text);
+    cb("123");
+  });
 });
