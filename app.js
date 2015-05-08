@@ -61,8 +61,9 @@ app.use(function(err, req, res, next){
 });
 
 var server = http.createServer(app);
-server.listen(config.get('port'),function(){
-  log.info('Express server listening on port ' + config.get('port'));
+var port = Number(process.env.PORT || config.get('port'));
+server.listen(port,function(){
+  log.info('Express server listening on port ' + port);
 });
 
 var io = require('./socket')(server);
