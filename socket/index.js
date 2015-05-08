@@ -55,33 +55,7 @@ module.exports = function(server){
     return this;
   };
 
-  io.sockets.on('session:reload', function(sid) {
-    var clients = io.sockets.clients();
-
-    clients.forEach(function(client) {
-      if (client.request.session.id != sid) return;
-
-      loadSession(sid, function(err, session) {
-
-        if (err) {
-          client.emit("error", "server error");
-          client.disconnect();
-          return;
-        }
-
-        if (!session) {
-          client.emit("logout");
-          client.disconnect();
-          return;
-        }
-
-        client.request.session = session;
-      });
-
-    });
-
-  });
-
+  
   io.set('authorization', function(handshake, callback){
     async.waterfall([
         function(callback){
