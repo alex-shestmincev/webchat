@@ -3,7 +3,7 @@
 
 <p class="lead">Здесь будет чат.</p>
 
-<script src="/socket.io/socket.io.js"></script>
+<script src="/vendor/bower_components/socket.io-client/socket.io.js"></script>
 
 <div id="room">
     <ul></ul>
@@ -13,24 +13,59 @@
 </div>
 
 <script>
-    var socket = io.connect();
+    var socket = io.connect('',{
+        'reconnection delay' : 1
+    });
 
     var form = $('#room form');
     var ul = $('#room ul');
+    var input = form.find(':input');
 
-    form.submit(function(){
-       var input = $(this).find(':input');
+    socket
+        .on('message', function (username,message) {
+            printMessage(username + " > " + message);
+        })
+        .on('leave', function(username){
+            printStatus(username + " вышел из чата");
+        })
+        .on('join', function(username){
+            printStatus(username + " вошел в чат");
+        })
+        .on('connect', function () {
+            printStatus("соединение установлено");
+            form.on('submit', sendMessage);
+            input.prop('disabled', false);
+        })
+        .on('disconnect', function () {
+            printStatus("соединение потеряно");
+            form.off('submit', sendMessage);
+            input.prop('disabled', true);
+        })
+        .on('logout', function() {
+            location.href = "/";
+        })
+        .on('reconnect_failed', function () {
+            alert('Соединение умерло');
+        })
+    ;
+
+    function sendMessage(){
         var text = input.val();
-        input.val('');
-
-        socket.emit('message', text, function(data){
-            $('<li>', {text: text}).appendTo(ul);
+        socket.emit('message', text, function(){
+           printMessage("я > " + text);
         });
 
-        return false;
-    });
 
-    socket.on('message', function (text) {
+        input.val('');
+        return false;
+    }
+
+    function printMessage(text){
         $('<li>', {text: text}).appendTo(ul);
-    });
+    }
+
+    function printStatus(text){
+        $('<li>', {text: text}).appendTo(ul);
+    }
+
 </script>

@@ -24,12 +24,13 @@ if(app.get('env') == 'development'){
 app.use(express.bodyParser()); // req.body
 app.use(express.cookieParser()); // req.cookies
 
-var MongoStore = require('connect-mongo')(express);
+var sessionStore = require('lib/sessionStore');
+
 app.use(express.session({
   secret: config.get('session:secret'),
   key: config.get('session:key'),
   cookie: config.get('session:cookie'),
-  store: new MongoStore({mongooseConnection: mongoose.connection})
+  store: sessionStore
 }));
 
 app.use(require('middleware/sendHttpError'));
@@ -43,7 +44,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function(err, req, res, next){
   if (typeof err == 'number'){
-    err = new HttpError(err);
+    err = new Http/Error(err);
   }
 
   if (err instanceof HttpError){
@@ -64,11 +65,7 @@ server.listen(config.get('port'),function(){
   log.info('Express server listening on port ' + config.get('port'));
 });
 
-var io = require('socket.io')(server);
+var io = require('./socket')(server);
+app.set('io', io);
+log.debug('io - ' + app.get('io'));
 
-io.on('connection', function (socket) {
-  socket.on('message', function(text, cb){ // cb - callback, который вернется клиенту
-    socket.broadcast.emit('message', text);
-    cb("123");
-  });
-});
