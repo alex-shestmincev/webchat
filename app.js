@@ -1,12 +1,12 @@
 var express = require('express');
 var http = require('http');
 var path = require('path');
-var config = require('config');
-var log = require('lib/log')(module);
+var config = require('./config');
+var log = require('./lib/log')(module);
 var favicon = require('serve-favicon');
 var logger = require('morgan');
-var HttpError = require('error').HttpError;
-var mongoose = require('lib/mongoose');
+var HttpError = require('./error').HttpError;
+var mongoose = require('./lib/mongoose');
 
 var app = express();
 app.engine('ejs', require('ejs-locals'));
@@ -24,7 +24,7 @@ if(app.get('env') == 'development'){
 app.use(express.bodyParser()); // req.body
 app.use(express.cookieParser()); // req.cookies
 
-var sessionStore = require('lib/sessionStore');
+var sessionStore = require('./lib/sessionStore');
 
 app.use(express.session({
   secret: config.get('session:secret'),
@@ -33,12 +33,12 @@ app.use(express.session({
   store: sessionStore
 }));
 
-app.use(require('middleware/sendHttpError'));
-app.use(require('middleware/loadUser'));
+app.use(require('./middleware/sendHttpError'));
+app.use(require('./middleware/loadUser'));
 
 app.use(app.router);
 
-require('routes')(app);
+require('./routes')(app);
 
 app.use(express.static(path.join(__dirname, 'public')));
 

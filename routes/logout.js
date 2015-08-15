@@ -1,4 +1,4 @@
-var Log = require('lib/log')(module);
+var Log = require('./../lib/log')(module);
 exports.post = function(req, res, next){
   var io = req.app.get('io');
   var sid = req.session.id;
